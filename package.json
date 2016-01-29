@@ -5,6 +5,7 @@
   "main": "main.js",
   "author": "Sébastien VIDAL",
   "license": "ISC",
+  "github" : "https://github.com/Psychopoulet/MIA-plugin-VideoManager",
   "web" : {
     "widgetcontroller" : "ControllerWidget",
     "templates" : {
