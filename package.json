@@ -1,0 +1,17 @@
+{
+  "name": "Vidéos manager",
+  "description": "",
+  "version": "0.0.1",
+  "main": "main.js",
+  "author": "Sébastien VIDAL",
+  "license": "ISC",
+  "web" : {
+    "widgetcontroller" : "ControllerWidget",
+    "templates" : {
+      "widget" : "web/template.html"
+    },
+  	"javascripts" : [
+  		"web/ControllerWidget.js"
+  	]
+  }
+}
