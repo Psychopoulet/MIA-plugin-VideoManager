@@ -2,8 +2,7 @@
 // dépendances
 	
 	const 	path = require('path'),
-			fs = require('fs'),
-			q = require('q');
+			fs = require('fs');
 
 // module
 	
@@ -21,23 +20,23 @@
 
 				function _load() {
 
-					var deferred = q.defer();
+					return new Promise(function(resolve, reject) {
 
 						try {
 
 							fs.readFile(m_sBufferFilePath, { encoding : 'utf8' } , function (err, data) {
 
 								if (err) {
-									deferred.reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
+									reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
 								}
 								else {
 
 									try {
 										m_tabCategories = JSON.parse(data);
-										deferred.resolve();
+										resolve();
 									}
 									catch (e) {
-										deferred.reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
+										reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
 									}
 
 								}
@@ -46,36 +45,36 @@
 
 						}
 						catch(e) {
-							deferred.reject((e.message) ? e.message : e);
+							reject((e.message) ? e.message : e);
 						}
-					
-					return deferred.promise;
+
+					});
 
 				}
 
 				function _save() {
 
-					var deferred = q.defer();
+					return new Promise(function(resolve, reject) {
 
 						try {
 
 							fs.writeFile(m_sBufferFilePath, JSON.stringify(m_tabCategories), { encoding : 'utf8' } , function (err, data) {
 
 								if (err) {
-									deferred.reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
+									reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
 								}
 								else {
-									deferred.resolve();
+									resolve();
 								}
 
 							});
 
 						}
 						catch (e) {
-							deferred.reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
+							reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
 						}
 
-					return deferred.promise;
+					});
 
 				}
 
