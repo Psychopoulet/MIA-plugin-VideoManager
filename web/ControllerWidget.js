@@ -1,4 +1,4 @@
-app.controller('ControllerWidget',
+app.controller('ControllerVideosManager',
 	['$scope', '$popup', 'ModelChilds',
 	function($scope, $popup, ModelChilds) {
 
