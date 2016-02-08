@@ -6,13 +6,9 @@
   "author": "Sébastien VIDAL",
   "license": "ISC",
   "github" : "https://github.com/Psychopoulet/MIA-plugin-VideoManager",
-  "web" : {
-    "widgetcontroller" : "ControllerWidget",
-    "templates" : {
-      "widget" : "web/template.html"
-    },
-  	"javascripts" : [
-  		"web/ControllerWidget.js"
-  	]
-  }
+  "widget" : "web/template.html",
+  "templates" : [],
+	"javascripts" : [
+		"web/ControllerWidget.js"
+	]
 }
