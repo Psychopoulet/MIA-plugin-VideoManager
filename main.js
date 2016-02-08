@@ -95,7 +95,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 			try {
 
-				fs.writeFile(that.backupFilePath, JSON.stringify(this.categories), { encoding : 'utf8' } , function (err, data) {
+				fs.writeFile(that.backupFilePath, JSON.stringify(that.categories), { encoding : 'utf8' } , function (err, data) {
 
 					if (err) {
 						reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
@@ -156,7 +156,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 		}
 		catch(e) {
-			Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+			Container.get('logs').err('-- [plugins/VideosManager] - loadCategories : ' + ((e.message) ? e.message : e));
 			Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 		}
 
@@ -180,7 +180,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 		}
 		catch(e) {
-			Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+			Container.get('logs').err('-- [plugins/VideosManager] - loadVideosByCategory : ' + ((e.message) ? e.message : e));
 			Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 		}
 
@@ -255,6 +255,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 							})
 							.catch(function(err) {
+								Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.add : ' + err);
 								socket.emit('plugins.videos.error', err);
 							});
 
@@ -262,7 +263,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.add : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -300,6 +301,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 							})
 							.catch(function(err) {
+								Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.edit : ' + err);
 								socket.emit('plugins.videos.error', err);
 							});
 
@@ -307,7 +309,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.edit : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -330,12 +332,13 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 						that.save().then(function() { that.loadCategories(Container); })
 						.catch(function(err) {
+							Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.delete : ' + err);
 							socket.emit('plugins.videos.error', err);
 						});
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.delete : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -396,6 +399,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 									Container.get('websockets').emit('plugins.videos.video.added', stVideo);
 								})
 								.catch(function(err) {
+									Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.add : ' + err);
 									socket.emit('plugins.videos.error', err);
 								});
 
@@ -405,7 +409,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.add : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -456,6 +460,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 									Container.get('websockets').emit('plugins.videos.video.edited', stVideo);
 								})
 								.catch(function(err) {
+									Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.edit : ' + err);
 									socket.emit('plugins.videos.error', err);
 								});
 
@@ -465,7 +470,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.edit : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -511,6 +516,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 								that.loadVideosByCategory(Container, data.category);
 							})
 							.catch(function(err) {
+								Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.delete : ' + err);
 								socket.emit('plugins.videos.error', err);
 							});
 
@@ -518,7 +524,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 					}
 					catch (e) {
-						Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+						Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.delete : ' + ((e.message) ? e.message : e));
 						Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 					}
 
@@ -552,7 +558,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 						}
 						catch (e) {
-							Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+							Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.playsound : ' + ((e.message) ? e.message : e));
 							Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 						}
 
@@ -584,7 +590,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 						}
 						catch (e) {
-							Container.get('logs').err('-- [plugins] : ' + ((e.message) ? e.message : e));
+							Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.playvideo : ' + ((e.message) ? e.message : e));
 							Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 						}
 
