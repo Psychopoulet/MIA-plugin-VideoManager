@@ -151,8 +151,8 @@ app.controller('ControllerVideosManager',
 
 			// categories
 
-			.on('plugins.videos.categories', function (data) {
-				$scope.categories = data;
+			.on('plugins.videos.categories', function (categories) {
+				$scope.categories = categories;
 				$scope.selectCategory(null);
 				$scope.$apply();
 			})
@@ -183,8 +183,9 @@ app.controller('ControllerVideosManager',
 
 			// videos
 
-			socket.on('plugins.videos.videos', function (data) {
-				$scope.videos = data;
+			socket.on('plugins.videos.videos', function (videos) {
+
+				$scope.videos = videos;
 				$scope.selectedvideo = null;
 				$scope.$apply();
 			})
