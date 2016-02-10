@@ -603,8 +603,12 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 	}
 
 	free (Container) {
+
 		super.free();
+
+		this.categories = null;
 		Container.get('websockets').getSockets().forEach(_freeSocket);
+		
 	}
 
 };
