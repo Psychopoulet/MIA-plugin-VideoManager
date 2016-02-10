@@ -35,6 +35,26 @@
 
 	}
 
+	function _freeSocket(socket) {
+
+		// categories
+
+			socket.removeAllListeners('plugins.videos.category.add');
+			socket.removeAllListeners('plugins.videos.category.edit');
+			socket.removeAllListeners('plugins.videos.category.delete');
+
+		// videos
+
+			socket.removeAllListeners('plugins.videos.videos');
+
+			socket.removeAllListeners('plugins.videos.video.add');
+			socket.removeAllListeners('plugins.videos.video.edit');
+			socket.removeAllListeners('plugins.videos.video.delete');
+
+			socket.removeAllListeners('plugins.videos.video.play');
+
+	}
+
 // module
 
 module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
@@ -190,25 +210,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 		var that = this;
 
-		Container.get('websockets').onDisconnect(function(socket) {
-
-			// categories
-
-				socket.removeAllListeners('plugins.videos.category.add');
-				socket.removeAllListeners('plugins.videos.category.edit');
-				socket.removeAllListeners('plugins.videos.category.delete');
-
-			// videos
-
-				socket.removeAllListeners('plugins.videos.videos');
-
-				socket.removeAllListeners('plugins.videos.video.add');
-				socket.removeAllListeners('plugins.videos.video.edit');
-				socket.removeAllListeners('plugins.videos.video.delete');
-
-				socket.removeAllListeners('plugins.videos.video.play');
-
-		})
+		Container.get('websockets').onDisconnect(_freeSocket)
 		.onLog(function(socket) {
 
 			that.loadCategories(Container);
@@ -600,8 +602,13 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 	}
 
-	free () {
+	free (Container) {
+
 		super.free();
+
+		this.categories = null;
+		Container.get('websockets').getSockets().forEach(_freeSocket);
+		
 	}
 
 };
