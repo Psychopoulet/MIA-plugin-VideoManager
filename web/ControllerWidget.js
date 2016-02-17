@@ -1,6 +1,6 @@
 app.controller('ControllerVideosManager',
-	['$scope', '$popup', 'ModelChilds',
-	function($scope, $popup, ModelChilds) {
+	['$scope', '$popup', '$actions', 'ModelChilds',
+	function($scope, $popup, $actions, ModelChilds) {
 
 	"use strict";
 
@@ -111,17 +111,27 @@ app.controller('ControllerVideosManager',
 					$scope.playSound = function (child, video) {
 
 						socket.emit('plugins.videos.video.playsound', {
-		                    child : child, video : video
-		                });
+							child : child, video : video
+						});
 
 					};
 
 					$scope.playVideo = function (child, video) {
 
 						socket.emit('plugins.videos.video.playvideo', {
-		                    child : child, video : video
-		                });
+							child : child, video : video
+						});
 
+					};
+
+				// actions
+
+					$scope.createSoundAction = function (child, video) {
+						$actions.add(video.name, child, 'media.sound.play', video).catch($popup.alert);
+					};
+
+					$scope.createVideoAction = function (child, video) {
+						$actions.add(video.name, child, 'media.video.play', video).catch($popup.alert);
 					};
 
 	// constructor
