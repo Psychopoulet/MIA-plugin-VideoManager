@@ -51,7 +51,8 @@
 			socket.removeAllListeners('plugins.videos.video.edit');
 			socket.removeAllListeners('plugins.videos.video.delete');
 
-			socket.removeAllListeners('plugins.videos.video.play');
+			socket.removeAllListeners('plugins.videos.video.playsound');
+			socket.removeAllListeners('plugins.videos.video.playvideo');
 
 	}
 
