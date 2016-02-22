@@ -1,6 +1,6 @@
 app.controller('ControllerVideosManager',
-	['$scope', '$popup', '$actions', 'ModelChilds',
-	function($scope, $popup, $actions, ModelChilds) {
+	['$scope', '$popup', '$actions',
+	function($scope, $popup, $actions) {
 
 	"use strict";
 
@@ -140,11 +140,10 @@ app.controller('ControllerVideosManager',
 
 			// childs
 
-			ModelChilds.onError($popup.alert)
-			.onChange(function(data) {
+		    socket.on('childs', function (childs) {
 
 				$scope.childs = [];
-				angular.forEach(data, function(child) {
+				angular.forEach(childs, function(child) {
 
 					if (child.connected && child.allowed) {
 						$scope.childs.push(child);
@@ -155,9 +154,8 @@ app.controller('ControllerVideosManager',
 				$scope.selectedchild = (1 == $scope.childs.length) ? $scope.childs[0] : null;
 				$scope.$apply();
 
-			});
-
-			socket.on('plugins.videos.error', $popup.alert)
+		    })
+		    .on('plugins.videos.error', $popup.alert)
 
 			// categories
 
