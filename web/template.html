@@ -15,11 +15,17 @@
 
 				<div class="input-group">
 
+					<div class="form-group" data-ng-show="1 >= categories.length">
+						<div class="form-control" data-ng-show="0 == categories.length">-- NC --</div>
+						<div class="form-control" data-ng-show="1 == categories.length">{{selectedcategory.name}}</div>
+					</div>
+
 					<select class="form-control"
 							data-ng-disabled="!categories.length" data-ng-class="{'disabled' : !categories.length }"
 							data-ng-options="category.name for category in categories"
 							data-ng-model="selectedcategory"
-							data-ng-change="selectCategory(selectedcategory);">
+							data-ng-change="selectCategory(selectedcategory);"
+							data-ng-show="1 < categories.length">
 						<option value="">-- NC --</option>
 					</select>
 
@@ -59,10 +65,16 @@
 
 					<div class="input-group">
 
+						<div class="form-group" data-ng-show="1 >= videos.length">
+							<div class="form-control" data-ng-show="0 == videos.length">-- NC --</div>
+							<div class="form-control" data-ng-show="1 == videos.length">{{selectedvideo.name}}</div>
+						</div>
+
 						<select class="form-control"
 								data-ng-disabled="!videos.length" data-ng-class="{'disabled' : !videos.length }"
 								data-ng-options="video.name for video in videos"
-								data-ng-model="selectedvideo">
+								data-ng-model="selectedvideo"
+								data-ng-show="1 < childs.length">
 							<option value="">-- NC --</option>
 						</select>
 
@@ -109,10 +121,9 @@
 
 						<div class="input-group">
 
-							<div class="form-group" data-ng-show="1 == childs.length">
-								<div class="form-control">
-									{{selectedchild.name}}
-								</div>
+							<div class="form-group" data-ng-show="1 >= childs.length">
+								<div class="form-control" data-ng-show="0 == childs.length">-- NC --</div>
+								<div class="form-control" data-ng-show="1 == childs.length">{{selectedchild.name}}</div>
 							</div>
 
 							<select class="form-control"
