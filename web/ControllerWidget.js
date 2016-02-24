@@ -161,6 +161,7 @@ app.controller('ControllerVideosManager',
 
 			socket.on('actionstypes', function(actionstypes) {
 				tabActionsTypes = actionstypes;
+				$scope.$apply();
 			})
 
 			// childs
