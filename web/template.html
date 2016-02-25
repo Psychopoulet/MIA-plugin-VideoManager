@@ -16,7 +16,7 @@
 				<div class="input-group">
 
 					<div class="form-group" data-ng-show="1 >= categories.length">
-						<div class="form-control" data-ng-show="0 == categories.length">-- NC --</div>
+						<div class="form-control" data-ng-show="0 == categories.length">-- Aucune catégorie --</div>
 						<div class="form-control" data-ng-show="1 == categories.length">{{selectedcategory.name}}</div>
 					</div>
 
@@ -26,7 +26,7 @@
 							data-ng-model="selectedcategory"
 							data-ng-change="selectCategory(selectedcategory);"
 							data-ng-show="1 < categories.length">
-						<option value="">-- NC --</option>
+						<option value="">-- Choisissez une catégorie --</option>
 					</select>
 
 					<span class="input-group-btn">
@@ -66,7 +66,7 @@
 					<div class="input-group">
 
 						<div class="form-group" data-ng-show="1 >= videos.length">
-							<div class="form-control" data-ng-show="0 == videos.length">-- NC --</div>
+							<div class="form-control" data-ng-show="0 == videos.length">-- Aucune vidéo --</div>
 							<div class="form-control" data-ng-show="1 == videos.length">{{selectedvideo.name}}</div>
 						</div>
 
@@ -74,8 +74,8 @@
 								data-ng-disabled="!videos.length" data-ng-class="{'disabled' : !videos.length }"
 								data-ng-options="video.name for video in videos"
 								data-ng-model="selectedvideo"
-								data-ng-show="1 < childs.length">
-							<option value="">-- NC --</option>
+								data-ng-show="1 < videos.length">
+							<option value="">-- Choisissez une vidéo --</option>
 						</select>
 
 						<span class="input-group-btn">
@@ -122,7 +122,7 @@
 						<div class="input-group">
 
 							<div class="form-group" data-ng-show="1 >= childs.length">
-								<div class="form-control" data-ng-show="0 == childs.length">-- NC --</div>
+								<div class="form-control" data-ng-show="0 == childs.length">-- Aucun enfant --</div>
 								<div class="form-control" data-ng-show="1 == childs.length">{{selectedchild.name}}</div>
 							</div>
 
@@ -130,7 +130,7 @@
 									data-ng-options="child.name for child in childs"
 									data-ng-model="selectedchild"
 									data-ng-show="1 < childs.length">
-								<option value="">-- NC --</option>
+								<option value="">-- Choisissez un enfant --</option>
 							</select>
 
 							<span class="input-group-btn">
