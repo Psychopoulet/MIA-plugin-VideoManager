@@ -9,6 +9,7 @@ app.controller('ControllerVideosManager',
 		// private
 
 			var clModalForm = jQuery('#modalFormVideo');
+			var tabActionsTypes = [];
 
 		// public
 
@@ -127,25 +128,50 @@ app.controller('ControllerVideosManager',
 				// actions
 
 					$scope.createSoundAction = function (child, video) {
-						$actions.add(video.name, child, 'media.sound.play', video).catch($popup.alert);
+
+						for (var i = 0; i < tabActionsTypes.length; ++i) {
+
+							if (tabActionsTypes[i].command == 'media.sound.play') {
+								$actions.add(video.name, child, tabActionsTypes[i], video);
+								break;
+							}
+
+						}
+
 					};
 
 					$scope.createVideoAction = function (child, video) {
-						$actions.add(video.name, child, 'media.video.play', video).catch($popup.alert);
+
+						for (var i = 0; i < tabActionsTypes.length; ++i) {
+
+							if (tabActionsTypes[i].command == 'media.video.play') {
+								$actions.add(video.name, child, tabActionsTypes[i], video);
+								break;
+							}
+
+						}
+
 					};
 
 	// constructor
 
 		// events
 
+			// actionstypes
+
+			socket.on('actionstypes', function(actionstypes) {
+				tabActionsTypes = actionstypes;
+				$scope.$apply();
+			})
+
 			// childs
 
-		    socket.on('childs', function (childs) {
+		    .on('childs', function (childs) {
 
 				$scope.childs = [];
 				angular.forEach(childs, function(child) {
 
-					if (child.connected && child.allowed) {
+					if (child.connected && 'ACCEPTED' == child.status.code) {
 						$scope.childs.push(child);
 					}
 
@@ -161,7 +187,7 @@ app.controller('ControllerVideosManager',
 
 			.on('plugins.videos.categories', function (categories) {
 				$scope.categories = categories;
-				$scope.selectCategory(null);
+				$scope.selectCategory((1 == $scope.categories.length) ? $scope.categories[0] : null);
 				$scope.$apply();
 			})
 
@@ -194,8 +220,10 @@ app.controller('ControllerVideosManager',
 			socket.on('plugins.videos.videos', function (videos) {
 
 				$scope.videos = videos;
-				$scope.selectedvideo = null;
+				$scope.selectedvideo = (1 == $scope.videos.length) ? $scope.videos[0] : null;
+				
 				$scope.$apply();
+
 			})
 
 			.on('plugins.videos.video.added', function (video) {
