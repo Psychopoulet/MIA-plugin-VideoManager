@@ -607,6 +607,8 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 		super.free();
 
+		fs.unlinkSync(this.backupFilePath);
+
 		this.categories = null;
 		Container.get('websockets').getSockets().forEach(_freeSocket);
 		
