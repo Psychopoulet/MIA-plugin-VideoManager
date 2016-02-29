@@ -142,7 +142,7 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 		try {
 
-			if (0 < this.categories.length) {
+			if (this.categories && 0 < this.categories.length) {
 
 				this.categories.forEach(function(category) {
 
