@@ -4,8 +4,8 @@
 // deps
 
 	const	path = require('path'),
-			fs = require('fs'),
-			simpleplugin = require('simpleplugin');
+			fs = require('simplefs'),
+			SimplePluginsManager = require('simplepluginsmanager');
 
 // private
 
@@ -58,7 +58,7 @@
 
 // module
 
-module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
+module.exports = class MIAPluginVideosManager extends SimplePluginsManager.SimplePlugin {
 
 	constructor () {
 
@@ -603,12 +603,16 @@ module.exports = class MIAPluginVideosManager extends require('simpleplugin') {
 
 	}
 
-	free (Container) {
+	free (Container, isADelete) {
 
 		super.free();
 
 		this.categories = null;
 		Container.get('websockets').getSockets().forEach(_freeSocket);
+
+		if (isADelete && fs.fileExists(this.backupFilePath)) {
+			fs.unlinkSync(this.backupFilePath);
+		}
 		
 	}
 
