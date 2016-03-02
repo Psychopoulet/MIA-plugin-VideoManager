@@ -89,7 +89,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 						try {
 							that.categories = JSON.parse(data);
-							resolve();
+							resolve(that.categories);
 						}
 						catch (e) {
 							reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
@@ -158,9 +158,9 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 			}
 			else {
 
-				this.load().then(function() {
+				this.load().then(function(categories) {
 
-					this.categories.forEach(function(category) {
+					categories.forEach(function(category) {
 
 						tabCategories.push({
 							code : category.code,
