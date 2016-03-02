@@ -1,7 +1,7 @@
 {
-  "name": "Vidéos manager",
-  "description": "https://github.com/Psychopoulet/MIA-plugin-VideoManager",
-  "version": "1.1.2",
+  "name": "Gestionnaire de vidéos",
+  "description": "Récupérez et utilisez vos vidéos Youtube & Dailymotion dans MIA",
+  "version": "1.1.3",
   "main": "main.js",
   "author": "Sébastien VIDAL",
   "license": "ISC",
