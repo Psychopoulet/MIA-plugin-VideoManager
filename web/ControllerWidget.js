@@ -45,23 +45,35 @@ app.controller('ControllerVideosManager',
 
 				$scope.addCategory = function () {
 
-					$popup.prompt('Nouvelle catégorie', '', function(name) {
-						socket.emit('plugins.videos.category.add', { name : name });
+					$popup.prompt({
+						title: 'Nouvelle catégorie',
+						onconfirm: function(name) {
+							socket.emit('plugins.videos.category.add', { name : name });
+						}
 					});
 
 				};
 				$scope.editCategory = function (category) {
 
-					$popup.prompt('', category.name, function(name) {
-						category.name = name;
-						socket.emit('plugins.videos.category.edit', category);
+					$popup.prompt({
+						title: 'Modifier catégorie',
+						val: category.name,
+						onconfirm: function(name) {
+							category.name = name;
+							socket.emit('plugins.videos.category.edit', category);
+						}
 					});
 
 				};
 				$scope.deleteCategory = function (category) {
 
-					$popup.confirm('Voulez-vous vraiment supprimer "' + category.name + '" ?', 'Confirmation', function() {
-						socket.emit('plugins.videos.category.delete', category);
+					$popup.confirm({
+						title: 'Supprimer catégorie',
+						message: 'Voulez-vous vraiment supprimer "' + category.name + '" ?',
+						val: category.name,
+						onconfirm: function() {
+							socket.emit('plugins.videos.category.delete', category);
+						}
 					});
 
 				};
@@ -91,8 +103,13 @@ app.controller('ControllerVideosManager',
 				};
 				$scope.deleteVideo = function (category, video) {
 
-					$popup.confirm('Voulez-vous vraiment supprimer "' + video.name + '" ?', 'Confirmation', function() {
-						socket.emit('plugins.videos.video.delete', { category : category, video : video });
+					$popup.confirm({
+						title: 'Supprimer vidéo',
+						message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
+						val: category.name,
+						onconfirm: function() {
+							socket.emit('plugins.videos.video.delete', { category : category, video : video });
+						}
 					});
 
 				};
@@ -181,7 +198,14 @@ app.controller('ControllerVideosManager',
 				$scope.$apply();
 
 		    })
-		    .on('plugins.videos.error', $popup.alert)
+		    .on('plugins.videos.error', function(err) {
+
+		    	$popup.alert({
+		    		message: err,
+		    		type: 'danger'
+		    	});
+
+		    })
 
 			// categories
 
