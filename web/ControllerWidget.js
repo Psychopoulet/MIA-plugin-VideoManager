@@ -183,7 +183,7 @@ app.controller('ControllerVideosManager',
 
 			// childs
 
-		    .on('childs', function (childs) {
+			.on('childs', function (childs) {
 
 				$scope.childs = [];
 				angular.forEach(childs, function(child) {
@@ -197,15 +197,15 @@ app.controller('ControllerVideosManager',
 				$scope.selectedchild = (1 == $scope.childs.length) ? $scope.childs[0] : null;
 				$scope.$apply();
 
-		    })
-		    .on('plugins.videos.error', function(err) {
+			})
+			.on('plugins.videos.error', function(err) {
 
-		    	$popup.alert({
-		    		message: err,
-		    		type: 'danger'
-		    	});
+				$popup.alert({
+					message: err,
+					type: 'danger'
+				});
 
-		    })
+			})
 
 			// categories
 

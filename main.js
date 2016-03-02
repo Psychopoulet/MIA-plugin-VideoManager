@@ -11,23 +11,31 @@
 
 	function _formateVideo(video) {
 
-		video.url = video.url 	.replace('http:', 'https:')
-								.replace('m.', '')
-								.replace('//youtu', '//www.youtu')
-								.replace('youtu.be/', 'youtube.com/watch?v=')
-								.replace(/&(.*)/, '');
+		if (-1 < video.url.indexOf('youtu')) {
 
-		video.urlembeded = video.url 	.replace('.com/', '.com/embed/')
-										.replace('watch?v=', '');
+			if (!video.code || '' == video.code) {
 
-		if (!video.code || '' == video.code) {
+				if (-1 == video.url.indexOf('=')) {
+					video.url = video.url.replace('youtu.be/', 'youtube.com/watch?v=');
+				}
 
-			if (1 < video.url.split('=').length) {
-				video.code = video.url.split('=')[1];
+				video.code = video.url.replace(/&(.*)/, '').split('=')[1];
+				
 			}
-			else {
-				video.code = video.name;
+
+			video.url = 'https://www.youtube.com/watch?v=' + video.code;
+			video.urlembeded = 'https://www.youtube.com/embed/' + video.code;
+
+		}
+		else if (-1 < video.url.indexOf('dailymotion')) {
+
+			if (!video.code || '' == video.code) {
+				var parts = video.url.split('_')[0].split('/');
+				video.code = parts[parts.length-1];
 			}
+
+			video.url = 'https://www.dailymotion.com/video/' + video.code;
+			video.urlembeded = 'https://www.dailymotion.com/embed/video/' + video.code;
 
 		}
 
