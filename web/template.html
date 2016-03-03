@@ -104,7 +104,7 @@
 									data-ng-disabled="!selectedvideo" data-ng-class="{'disabled' : !selectedvideo  }"
 									data-ng-click="preview(selectedvideo);"
 									data-toggle="tooltip" data-placement="auto" title="Prévisualiser cette vidéo">
-									<span class="glyphicon glyphicon-play-circle"></span>
+									<span class="glyphicon glyphicon-play"></span>
 							</button>
 
 						</span>
@@ -136,14 +136,14 @@
 							<span class="input-group-btn">
 
 								<button type="button" class="btn btn-primary"
-										data-ng-disabled="!selectedchild || !selectedvideo.code" data-ng-class="{'disabled' : !selectedchild || !selectedvideo.code }"
+										data-ng-disabled="!selectedchild" data-ng-class="{'disabled' : !selectedchild }"
 										data-ng-click="playSound(selectedchild, selectedvideo);"
 										data-toggle="tooltip" data-placement="auto" title="Lire ce son sur cet enfant">
 										<span class="glyphicon glyphicon-music"></span>
 								</button>
 
 								<button type="button" class="btn btn-primary"
-										data-ng-disabled="!selectedchild || !selectedvideo.code" data-ng-class="{'disabled' : !selectedchild || !selectedvideo.code }"
+										data-ng-disabled="!selectedchild" data-ng-class="{'disabled' : !selectedchild }"
 										data-ng-click="playVideo(selectedchild, selectedvideo);"
 										data-toggle="tooltip" data-placement="auto" title="Lire cette vidéo sur cet enfant">
 										<span class="glyphicon glyphicon-facetime-video"></span>

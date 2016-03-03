@@ -24,151 +24,149 @@ app.controller('ControllerVideosManager',
 
 	// methods
 
-		// public
+		$scope.selectCategory = function (category) {
 
-			$scope.selectCategory = function (category) {
+			if (category) {
+				$scope.selectedcategory = category;
+				socket.emit('plugins.videos.videos', category);
+			}
+			else {
+				$scope.selectedcategory = null;
+				$scope.videos = [];
+			}
 
-				if (category) {
-					$scope.selectedcategory = category;
-					socket.emit('plugins.videos.videos', category);
-				}
-				else {
-					$scope.selectedcategory = null;
-					$scope.videos = [];
-				}
+		};
+
+		// models
+
+			// categories
+
+			$scope.addCategory = function () {
+
+				$popup.prompt({
+					title: 'Nouvelle catégorie',
+					onconfirm: function(name) {
+						socket.emit('plugins.videos.category.add', { name : name });
+					}
+				});
+
+			};
+			$scope.editCategory = function (category) {
+
+				$popup.prompt({
+					title: 'Modifier catégorie',
+					val: category.name,
+					onconfirm: function(name) {
+						category.name = name;
+						socket.emit('plugins.videos.category.edit', category);
+					}
+				});
+
+			};
+			$scope.deleteCategory = function (category) {
+
+				$popup.confirm({
+					title: 'Supprimer catégorie',
+					message: 'Voulez-vous vraiment supprimer "' + category.name + '" ?',
+					val: category.name,
+					onconfirm: function() {
+						socket.emit('plugins.videos.category.delete', category);
+					}
+				});
 
 			};
 
-			// models
+			// videos
 
-				// categories
+			$scope.openWindowVideo = function(category, video) {
+				$scope.formvideo = (video) ? angular.copy(video) : {};
+				clModalForm.modal('show');
+			};
 
-				$scope.addCategory = function () {
+			$scope.writeVideo = function (category, video) {
 
-					$popup.prompt({
-						title: 'Nouvelle catégorie',
-						onconfirm: function(name) {
-							socket.emit('plugins.videos.category.add', { name : name });
-						}
-					});
+				if (!video.name) {
+					$popup.alert("La vidéo n'a pas de nom.");
+				}
+				else if (!video.url) {
+					$popup.alert("La vidéo n'a pas d'url.");
+				}
+				else if (!video.code) {
+					socket.emit('plugins.videos.video.add', { category : category, video : video });
+				}
+				else {
+					socket.emit('plugins.videos.video.edit', { category : category, video : video });
+				}
 
-				};
-				$scope.editCategory = function (category) {
+			};
+			$scope.deleteVideo = function (category, video) {
 
-					$popup.prompt({
-						title: 'Modifier catégorie',
-						val: category.name,
-						onconfirm: function(name) {
-							category.name = name;
-							socket.emit('plugins.videos.category.edit', category);
-						}
-					});
-
-				};
-				$scope.deleteCategory = function (category) {
-
-					$popup.confirm({
-						title: 'Supprimer catégorie',
-						message: 'Voulez-vous vraiment supprimer "' + category.name + '" ?',
-						val: category.name,
-						onconfirm: function() {
-							socket.emit('plugins.videos.category.delete', category);
-						}
-					});
-
-				};
-
-				// videos
-
-				$scope.openWindowVideo = function(category, video) {
-					$scope.formvideo = (video) ? angular.copy(video) : {};
-					clModalForm.modal('show');
-				};
-
-				$scope.writeVideo = function (category, video) {
-
-					if (!video.name) {
-						$popup.alert("La vidéo n'a pas de nom.");
+				$popup.confirm({
+					title: 'Supprimer vidéo',
+					message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
+					val: category.name,
+					onconfirm: function() {
+						socket.emit('plugins.videos.video.delete', { category : category, video : video });
 					}
-					else if (!video.url) {
-						$popup.alert("La vidéo n'a pas d'url.");
-					}
-					else if (!video.code) {
-						socket.emit('plugins.videos.video.add', { category : category, video : video });
-					}
-					else {
-						socket.emit('plugins.videos.video.edit', { category : category, video : video });
-					}
+				});
 
+			};
+
+		// interface
+
+			$scope.closeModalFormVideo = function () {
+				clModalForm.modal('hide');
+			};
+
+			// play
+
+				$scope.preview = function (video) {
+					$popup.iframe(video.urlembeded + '?autoplay=1');
 				};
-				$scope.deleteVideo = function (category, video) {
 
-					$popup.confirm({
-						title: 'Supprimer vidéo',
-						message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
-						val: category.name,
-						onconfirm: function() {
-							socket.emit('plugins.videos.video.delete', { category : category, video : video });
-						}
+				$scope.playSound = function (child, video) {
+
+					socket.emit('plugins.videos.video.playsound', {
+						child : child, video : video
 					});
 
 				};
 
-			// interface
+				$scope.playVideo = function (child, video) {
 
-				$scope.closeModalFormVideo = function () {
-					clModalForm.modal('hide');
+					socket.emit('plugins.videos.video.playvideo', {
+						child : child, video : video
+					});
+
 				};
 
-				// play
+			// actions
 
-					$scope.preview = function (video) {
-						$popup.iframe(video.urlembeded + '?autoplay=1');
-					};
+				$scope.createSoundAction = function (child, video) {
 
-					$scope.playSound = function (child, video) {
+					for (var i = 0; i < tabActionsTypes.length; ++i) {
 
-						socket.emit('plugins.videos.video.playsound', {
-							child : child, video : video
-						});
-
-					};
-
-					$scope.playVideo = function (child, video) {
-
-						socket.emit('plugins.videos.video.playvideo', {
-							child : child, video : video
-						});
-
-					};
-
-				// actions
-
-					$scope.createSoundAction = function (child, video) {
-
-						for (var i = 0; i < tabActionsTypes.length; ++i) {
-
-							if (tabActionsTypes[i].command == 'media.sound.play') {
-								$actions.add(video.name, child, tabActionsTypes[i], video);
-								break;
-							}
-
+						if (tabActionsTypes[i].command == 'media.sound.play') {
+							$actions.add(video.name, child, tabActionsTypes[i], video);
+							break;
 						}
 
-					};
+					}
 
-					$scope.createVideoAction = function (child, video) {
+				};
 
-						for (var i = 0; i < tabActionsTypes.length; ++i) {
+				$scope.createVideoAction = function (child, video) {
 
-							if (tabActionsTypes[i].command == 'media.video.play') {
-								$actions.add(video.name, child, tabActionsTypes[i], video);
-								break;
-							}
+					for (var i = 0; i < tabActionsTypes.length; ++i) {
 
+						if (tabActionsTypes[i].command == 'media.video.play') {
+							$actions.add(video.name, child, tabActionsTypes[i], video);
+							break;
 						}
 
-					};
+					}
+
+				};
 
 	// constructor
 
