@@ -69,7 +69,7 @@ app.controller('ControllerVideosManager',
 					title: 'Supprimer catégorie',
 					message: 'Voulez-vous vraiment supprimer "' + category.name + '" ?',
 					val: category.name,
-					onconfirm: function() {
+					onyes: function() {
 						socket.emit('plugins.videos.category.delete', category);
 					}
 				});
@@ -105,7 +105,7 @@ app.controller('ControllerVideosManager',
 					title: 'Supprimer vidéo',
 					message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
 					val: category.name,
-					onconfirm: function() {
+					onyes: function() {
 						socket.emit('plugins.videos.video.delete', { category : category, video : video });
 					}
 				});
@@ -175,25 +175,27 @@ app.controller('ControllerVideosManager',
 			// actionstypes
 
 			socket.on('actionstypes', function(actionstypes) {
-				tabActionsTypes = actionstypes;
-				$scope.$apply();
+				$scope.$apply(function() { tabActionsTypes = actionstypes; });
 			})
 
 			// childs
 
 			.on('childs', function (childs) {
 
-				$scope.childs = [];
-				angular.forEach(childs, function(child) {
+				$scope.$apply(function() {
 
-					if (child.connected && 'ACCEPTED' == child.status.code) {
-						$scope.childs.push(child);
-					}
+					$scope.childs = [];
+					angular.forEach(childs, function(child) {
+
+						if (child.connected && 'ACCEPTED' == child.status.code) {
+							$scope.childs.push(child);
+						}
+
+					});
+					
+					$scope.selectedchild = (1 == $scope.childs.length) ? $scope.childs[0] : null;
 
 				});
-				
-				$scope.selectedchild = (1 == $scope.childs.length) ? $scope.childs[0] : null;
-				$scope.$apply();
 
 			})
 			.on('plugins.videos.error', function(err) {
@@ -208,70 +210,87 @@ app.controller('ControllerVideosManager',
 			// categories
 
 			.on('plugins.videos.categories', function (categories) {
-				$scope.categories = categories;
-				$scope.selectCategory((1 == $scope.categories.length) ? $scope.categories[0] : null);
-				$scope.$apply();
+
+				$scope.$apply(function() {
+
+					$scope.categories = categories;
+					$scope.selectCategory((1 == $scope.categories.length) ? $scope.categories[0] : null);
+					
+				});
+				
 			})
 
 			.on('plugins.videos.category.added', function (category) {
 
-				$scope.categories.push(category);
-				$scope.selectCategory(category);
+				$scope.$apply(function() {
 
-				$scope.$apply();
+					$scope.categories.push(category);
+					$scope.selectCategory(category);
 
+				});
+				
 			})
 			.on('plugins.videos.category.edited', function (category) {
 
-				for (var i = 0; i < $scope.categories.length; ++i) {
+				$scope.$apply(function() {
 
-					if (category.code == $scope.categories[i].code) {
-						$scope.categories[i] = category;
-						$scope.selectCategory(category);
-						break;
+					for (var i = 0; i < $scope.categories.length; ++i) {
+
+						if (category.code == $scope.categories[i].code) {
+							$scope.categories[i] = category;
+							$scope.selectCategory(category);
+							break;
+						}
+
 					}
-
-				}
 				
-				$scope.$apply();
-
+				});
+				
 			});
 
 			// videos
 
 			socket.on('plugins.videos.videos', function (videos) {
 
-				$scope.videos = videos;
-				$scope.selectedvideo = (1 == $scope.videos.length) ? $scope.videos[0] : null;
-				
-				$scope.$apply();
+				$scope.$apply(function() {
 
+					$scope.videos = videos;
+					$scope.selectedvideo = (1 == $scope.videos.length) ? $scope.videos[0] : null;
+					
+				});
+				
 			})
 
 			.on('plugins.videos.video.added', function (video) {
 				
-				$scope.videos.push(video);
-				$scope.selectedvideo = video;
+				$scope.$apply(function() {
 
-				$scope.closeModalFormVideo();
-				$scope.$apply();
+					$scope.videos.push(video);
+					$scope.selectedvideo = video;
 
+					$scope.closeModalFormVideo();
+					
+				});
+				
 			})
 			.on('plugins.videos.video.edited', function (video) {
 
-				for (var i = 0; i < $scope.videos.length; ++i) {
+				$scope.$apply(function() {
 
-					if (video.code == $scope.videos[i].code) {
-						$scope.videos[i] = video;
-						$scope.selectedvideo = video;
-						break;
+					for (var i = 0; i < $scope.videos.length; ++i) {
+
+						if (video.code == $scope.videos[i].code) {
+							$scope.videos[i] = video;
+							$scope.selectedvideo = video;
+							break;
+						}
+
 					}
-
-				}
+					
+					$scope.closeModalFormVideo();
+					
+				});
 				
-				$scope.closeModalFormVideo();
-				$scope.$apply();
-
 			});
 
 		// interface
