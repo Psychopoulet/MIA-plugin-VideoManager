@@ -72,15 +72,12 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 		super();
 
-		this.directory = __dirname;
-		this.loadDataFromPackageFile();
-
 		this.categories = [];
 		this.backupFilePath = path.join(__dirname, 'backup.json');
 
 	}
 
-	load () {
+	loadData () {
 
 		var that = this;
 
@@ -116,7 +113,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	}
 
-	save () {
+	saveData () {
 
 		var that = this;
 
@@ -166,7 +163,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 			}
 			else {
 
-				this.load().then(function(categories) {
+				this.loadData().then(function(categories) {
 
 					categories.forEach(function(category) {
 
@@ -215,7 +212,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	}
 
-	run (Container) {
+	load (Container) {
 
 		var that = this;
 
@@ -257,7 +254,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 							that.categories.push(data);
 
-							that.save().then(function() {
+							that.saveData().then(function() {
 
 								Container.get('websockets').emit('plugins.videos.category.added', {
 									code : data.name,
@@ -303,7 +300,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						}
 						else {
 
-							that.save().then(function() {
+							that.saveData().then(function() {
 
 								Container.get('websockets').emit('plugins.videos.category.edited', {
 									code : data.code,
@@ -341,7 +338,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 						});
 
-						that.save().then(function() { that.loadCategories(Container); })
+						that.saveData().then(function() { that.loadCategories(Container); })
 						.catch(function(err) {
 							Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.category.delete : ' + err);
 							socket.emit('plugins.videos.error', err);
@@ -406,7 +403,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 							}
 							else {
 								
-								that.save().then(function() {
+								that.saveData().then(function() {
 									Container.get('websockets').emit('plugins.videos.video.added', stVideo);
 								})
 								.catch(function(err) {
@@ -467,7 +464,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 							}
 							else {
 
-								that.save().then(function() {
+								that.saveData().then(function() {
 									Container.get('websockets').emit('plugins.videos.video.edited', stVideo);
 								})
 								.catch(function(err) {
@@ -523,7 +520,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						}
 						else {
 
-							that.save().then(function() {
+							that.saveData().then(function() {
 								that.loadVideosByCategory(Container, data.category);
 							})
 							.catch(function(err) {
@@ -611,14 +608,18 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	}
 
-	free (Container, isADelete) {
+	unload (Container) {
 
 		super.free();
 
 		this.categories = null;
 		Container.get('websockets').getSockets().forEach(_freeSocket);
 
-		if (isADelete && fs.fileExists(this.backupFilePath)) {
+	}
+
+	uninstall () {
+
+		if (fs.fileExists(this.backupFilePath)) {
 			fs.unlinkSync(this.backupFilePath);
 		}
 		
