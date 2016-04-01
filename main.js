@@ -614,7 +614,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	unload (Container) {
 
-		super.free();
+		super.unload();
 
 		this.categories = null;
 		Container.get('websockets').getSockets().forEach(_freeSocket);
