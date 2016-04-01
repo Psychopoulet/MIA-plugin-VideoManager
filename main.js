@@ -176,13 +176,17 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 					Container.get('websockets').emit('plugins.videos.categories', tabCategories);
 
+				})
+				.catch(function(err) {
+					Container.get('logs').err('-- [plugins/VideosManager] - loadCategories : ' + ((err.message) ? err.message : err));
+					socket.emit('plugins.videos.error', (err.message) ? err.message : err);
 				});
 
 			}
 
 		}
 		catch(e) {
-			Container.get('logs').err('-- [plugins/VideosManager] - loadCategories : ' + ((e.message) ? e.message : e));
+			Container.get('logs').err('-- [plugins/VideosManager/] - loadCategories : ' + ((e.message) ? e.message : e));
 			Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 		}
 
