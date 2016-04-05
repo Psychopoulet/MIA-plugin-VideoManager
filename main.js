@@ -30,7 +30,7 @@
 		else if (-1 < video.url.indexOf('dailymotion')) {
 
 			if (!video.code || '' == video.code) {
-				var parts = video.url.split('_')[0].split('/');
+				let parts = video.url.split('_')[0].split('/');
 				video.code = parts[parts.length-1];
 			}
 
@@ -79,7 +79,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	loadData () {
 
-		var that = this;
+		let that = this;
 
 		return new Promise(function(resolve, reject) {
 
@@ -115,7 +115,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	saveData () {
 
-		var that = this;
+		let that = this;
 
 		return new Promise(function(resolve, reject) {
 
@@ -143,7 +143,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	loadCategories (Container) {
 
-		var tabCategories = [];
+		let tabCategories = [];
 
 		try {
 
@@ -194,7 +194,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	loadVideosByCategory (Container, p_stCategory) {
 
-		var tabVideos = [];
+		let tabVideos = [];
 
 		try {
 
@@ -218,7 +218,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 	load (Container) {
 
-		var that = this;
+		let that = this;
 
 		Container.get('websockets').onDisconnect(_freeSocket)
 		.onLog(function(socket) {
@@ -233,7 +233,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						Container.get('logs').log('plugins.videos.category.add');
 					}
 
-					var bFound = false;
+					let bFound = false;
 
 					try {
 
@@ -286,7 +286,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						Container.get('logs').log('plugins.videos.category.edit');
 					}
 
-					var bFound = false;
+					let bFound = false;
 
 					try {
 
@@ -373,7 +373,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						}
 						else {
 
-							var bCategoryFound = false, stVideo = false;
+							let bCategoryFound = false, stVideo = false;
 
 								that.categories.forEach(function(category, key) {
 
@@ -439,7 +439,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						}
 						else {
 							
-							var bCategoryFound = false, stVideo = false;
+							let bCategoryFound = false, stVideo = false;
 
 								that.categories.forEach(function(category, catkey) {
 
@@ -493,7 +493,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 						Container.get('logs').log('plugins.videos.video.delete');
 					}
 
-					var bCategoryFound = false, bVideoFound = false;
+					let bCategoryFound = false, bVideoFound = false;
 
 					try {
 
