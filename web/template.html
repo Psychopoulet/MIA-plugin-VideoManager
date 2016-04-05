@@ -1,13 +1,11 @@
 
 <div class="col-xs-12 col-md-6">
 
-	<div class="panel panel-default" data-ng-controller="ControllerVideosManager">
+	<div class="card" data-ng-controller="ControllerVideosManager">
 
-		<div class="panel-heading">
-			<h4 class="panel-title">{{plugin.name}}</h4>
-		</div>
+		<div class="card-header">{{plugin.name}}</div>
 
-		<div class="panel-body">
+		<div class="card-block">
 
 			<div class="form-group">
 
@@ -34,21 +32,21 @@
 						<button type="button" class="btn btn-primary"
 								data-ng-click="addCategory();"
 								data-toggle="tooltip" data-placement="auto" title="Ajouter une catégorie">
-							<span class="glyphicon glyphicon-plus"></span>
+							<span class="fa fa-plus"></span>
 						</button>
 
 						<button type="button" class="btn btn-primary"
 								data-ng-disabled="!selectedcategory" data-ng-class="{'disabled' : !selectedcategory  }"
 								data-ng-click="editCategory(selectedcategory);"
 								data-toggle="tooltip" data-placement="auto" title="Modifier cette catégorie">
-								<span class="glyphicon glyphicon-pencil"></span>
+								<span class="fa fa-pencil"></span>
 						</button>
 
 						<button type="button" class="btn btn-primary"
 								data-ng-disabled="!selectedcategory" data-ng-class="{'disabled' : !selectedcategory  }"
 								data-ng-click="deleteCategory(selectedcategory);"
 								data-toggle="tooltip" data-placement="auto" title="Supprimer cette catégorie">
-								<span class="glyphicon glyphicon-trash"></span>
+								<span class="fa fa-trash"></span>
 						</button>
 
 					</span>
@@ -83,28 +81,28 @@
 							<button type="button" class="btn btn-primary"
 									data-ng-click="openWindowVideo(selectedcategory);"
 									data-toggle="tooltip" data-placement="auto" title="Ajouter une vidéo">
-								<span class="glyphicon glyphicon-plus"></span>
+								<span class="fa fa-plus"></span>
 							</button>
 
 							<button type="button" class="btn btn-primary"
 									data-ng-disabled="!selectedvideo" data-ng-class="{'disabled' : !selectedvideo  }"
 									data-ng-click="openWindowVideo(selectedcategory, selectedvideo);"
 									data-toggle="tooltip" data-placement="auto" title="Modifier cette vidéo">
-									<span class="glyphicon glyphicon-pencil"></span>
+									<span class="fa fa-pencil"></span>
 							</button>
 
 							<button type="button" class="btn btn-primary"
 									data-ng-disabled="!selectedvideo" data-ng-class="{'disabled' : !selectedvideo  }"
 									data-ng-click="deleteVideo(selectedcategory, selectedvideo);"
 									data-toggle="tooltip" data-placement="auto" title="Supprimer cette vidéo">
-									<span class="glyphicon glyphicon-trash"></span>
+									<span class="fa fa-trash"></span>
 							</button>
 
 							<button type="button" class="btn btn-primary"
 									data-ng-disabled="!selectedvideo" data-ng-class="{'disabled' : !selectedvideo  }"
 									data-ng-click="preview(selectedvideo);"
 									data-toggle="tooltip" data-placement="auto" title="Prévisualiser cette vidéo">
-									<span class="glyphicon glyphicon-play"></span>
+									<span class="fa fa-play"></span>
 							</button>
 
 						</span>
@@ -139,20 +137,20 @@
 										data-ng-disabled="!selectedchild" data-ng-class="{'disabled' : !selectedchild }"
 										data-ng-click="playSound(selectedchild, selectedvideo);"
 										data-toggle="tooltip" data-placement="auto" title="Lire ce son sur cet enfant">
-										<span class="glyphicon glyphicon-music"></span>
+										<span class="fa fa-music"></span>
 								</button>
 
 								<button type="button" class="btn btn-primary"
 										data-ng-disabled="!selectedchild" data-ng-class="{'disabled' : !selectedchild }"
 										data-ng-click="playVideo(selectedchild, selectedvideo);"
 										data-toggle="tooltip" data-placement="auto" title="Lire cette vidéo sur cet enfant">
-										<span class="glyphicon glyphicon-facetime-video"></span>
+										<span class="fa fa-facetime-video"></span>
 								</button>
 
 								<div class="btn-group" role="group">
 									<button type="button" class="btn btn-primary dropdown-toggle"
 											data-toggle="dropdown">
-										<span class="glyphicon glyphicon-fire"></span>&nbsp;&nbsp;<span class="caret"></span>
+										<span class="fa fa-fire"></span>&nbsp;&nbsp;<span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
 										<li>
