@@ -85,25 +85,32 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 			try {
 
-				fs.readFile(that.backupFilePath, { encoding : 'utf8' } , function (err, data) {
+				if (!fs.fileExists(that.backupFilePath)) {
+					resolve(that.categories);
+				}
+				else {
 
-					if (err) {
-						reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
-					}
-					else {
+					fs.readFile(that.backupFilePath, { encoding : 'utf8' } , function (err, data) {
 
-						try {
-							that.categories = JSON.parse(data);
-							resolve(that.categories);
-						}
-						catch (e) {
+						if (err) {
 							reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
 						}
+						else {
 
-					}
+							try {
+								that.categories = JSON.parse(data);
+								resolve(that.categories);
+							}
+							catch (e) {
+								reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
+							}
 
-				});
+						}
 
+					});
+
+				}
+		
 			}
 			catch(e) {
 				reject((e.message) ? e.message : e);
@@ -624,7 +631,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 	uninstall () {
 
 		if (fs.fileExists(this.backupFilePath)) {
-			fs.unlinkSync(this.backupFilePath);
+			fs.unlink(this.backupFilePath);
 		}
 		
 	}
