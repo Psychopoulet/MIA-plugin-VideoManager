@@ -622,9 +622,11 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 		super.unload();
 
+		let that = this;
+
 		return new Promise(function(resolve, reject) {
 
-			this.categories = null;
+			that.categories = null;
 			Container.get('websockets').getSockets().forEach(_freeSocket);
 
 			resolve();
