@@ -1,7 +1,7 @@
 {
   "name": "Gestionnaire de vidéos",
   "description": "Récupérez et utilisez vos vidéos Youtube & Dailymotion dans MIA",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "main": "main.js",
   "author": "Sébastien VIDAL",
   "license": "ISC",

@@ -9,7 +9,6 @@ app.controller('ControllerVideosManager',
 		// private
 
 			var clModalForm = jQuery('#modalFormVideo');
-			var tabActionsTypes = [];
 
 		// public
 
@@ -143,44 +142,20 @@ app.controller('ControllerVideosManager',
 			// actions
 
 				$scope.createSoundAction = function (child, video) {
-
-					for (var i = 0; i < tabActionsTypes.length; ++i) {
-
-						if (tabActionsTypes[i].command == 'media.sound.play') {
-							$actions.add(video.name, child, tabActionsTypes[i], video);
-							break;
-						}
-
-					}
-
+					$actions.add(video.name, child, $actions.getActionTypeByCommand('media.sound.play'), video);
 				};
 
 				$scope.createVideoAction = function (child, video) {
-
-					for (var i = 0; i < tabActionsTypes.length; ++i) {
-
-						if (tabActionsTypes[i].command == 'media.video.play') {
-							$actions.add(video.name, child, tabActionsTypes[i], video);
-							break;
-						}
-
-					}
-
+					$actions.add(video.name, child, $actions.getActionTypeByCommand('media.video.play'), video);
 				};
 
 	// constructor
 
 		// events
 
-			// actionstypes
-
-			socket.on('actionstypes', function(actionstypes) {
-				$scope.$apply(function() { tabActionsTypes = actionstypes; });
-			})
-
 			// childs
 
-			.on('childs', function (childs) {
+			socket.on('childs', function (childs) {
 
 				$scope.$apply(function() {
 

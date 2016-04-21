@@ -85,23 +85,31 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 			try {
 
-				fs.readFile(that.backupFilePath, { encoding : 'utf8' } , function (err, data) {
+				fs.isFileProm(that.backupFilePath).then(function(exists) {
 
-					if (err) {
-						reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
+					if (exists) {
+						resolve(that.categories);
 					}
 					else {
 
-						try {
-							that.categories = JSON.parse(data);
-							resolve(that.categories);
-						}
-						catch (e) {
-							reject('Impossible de lire les données enregistrée : ' + ((err.message) ? err.message : err) + '.');
-						}
+						fs.readFileProm(that.backupFilePath, 'utf8').then(function(content) {
+
+							try {
+								that.categories = JSON.parse(content);
+								resolve(that.categories);
+							}
+							catch (e) {
+								reject('Impossible de lire les données enregistrée : ' + ((e.message) ? e.message : e) + '.');
+							}
+
+						}).catch(function(err) {
+							reject('Impossible de lire les données enregistrée : ' + err + '.');
+						});
 
 					}
 
+				}).catch(function(err) {
+					reject('Impossible de lire les données enregistrée : ' + err + '.');
 				});
 
 			}
@@ -121,20 +129,13 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 
 			try {
 
-				fs.writeFile(that.backupFilePath, JSON.stringify(that.categories), { encoding : 'utf8' } , function (err, data) {
-
-					if (err) {
-						reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
-					}
-					else {
-						resolve();
-					}
-
+				fs.writeFileProm(that.backupFilePath, JSON.stringify(that.categories), 'utf8').then(resolve).catch(function(err) {
+					reject('Impossible de sauvegarder les données : ' + err + '.');
 				});
 
 			}
 			catch (e) {
-				reject('Impossible de sauvegarder les données : ' + ((err.message) ? err.message : err) + '.');
+				reject('Impossible de sauvegarder les données : ' + ((e.message) ? e.message : e) + '.');
 			}
 
 		});
@@ -622,11 +623,7 @@ module.exports = class MIAPluginVideosManager extends SimplePluginsManager.Simpl
 	}
 
 	uninstall () {
-
-		if (fs.fileExists(this.backupFilePath)) {
-			fs.unlinkSync(this.backupFilePath);
-		}
-		
+		fs.unlinkProm(this.backupFilePath);
 	}
 
 };
