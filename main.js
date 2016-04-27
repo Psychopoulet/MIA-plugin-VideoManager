@@ -143,26 +143,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 	}
 
-	/*saveData () {
-
-		let that = this;
-
-		return new Promise(function(resolve, reject) {
-
-			try {
-
-				fs.writeFileProm(that.backupFilePath, JSON.stringify(that.categories), 'utf8').then(resolve).catch(function(err) {
-					reject('Impossible de sauvegarder les données : ' + err + '.');
-				});
-
-			}
-			catch (e) {
-				reject('Impossible de sauvegarder les données : ' + ((e.message) ? e.message : e) + '.');
-			}
-
-		});
-
-	}
+	/*
 
 	loadVideosByCategory (Container, category) {
 
@@ -229,10 +210,8 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 						that.categories.searchByUser(user).then(function(categories) {
 							socket.emit('plugins.videos.categories', categories);
 						}).catch(function(err) {
-
 							Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUser] : ' + ((err.message) ? err.message : err));
 							socket.emit('plugins.videos.error', (err.message) ? err.message : err);
-
 						});
 
 						// categories
@@ -376,10 +355,29 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 							});
 
-						/*// videos
+						// videos
 
-							socket.on('plugins.videos.videos', function(p_stCategory) {
-								that.loadVideosByCategory(Container, p_stCategory);
+							socket.on('plugins.videos.videos', function(category) {
+
+								if (Container.get('conf').get('debug')) {
+									Container.get('logs').log('plugins.videos.videos');
+								}
+
+								try {
+
+									that.videos.searchByCategory(category).then(function(videos) {
+										socket.emit('plugins.videos.videos', videos);
+									}).catch(function(err) {
+										Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + err);
+										socket.emit('plugins.videos.error', err);
+									});
+
+								}
+								catch (e) {
+									Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + ((e.message) ? e.message : e));
+									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+								}
+
 							})
 
 							.on('plugins.videos.video.add', function (data) {
@@ -390,7 +388,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 								try {
 
-									if (!data || !data.video || !data.video.name || !data.video.url) {
+									/*if (!data || !data.video || !data.video.name || !data.video.url) {
 										socket.emit('plugins.videos.error', 'Des données sont manquantes.');
 									}
 									else {
@@ -439,11 +437,11 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 										}
 										
-									}
+									}*/
 
 								}
 								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.add : ' + ((e.message) ? e.message : e));
+									Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + ((e.message) ? e.message : e));
 									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 								}
 
@@ -456,7 +454,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 								try {
 
-									if (!data || !data.video || !data.video.name || !data.video.url || !data.video.code) {
+									/*if (!data || !data.video || !data.video.name || !data.video.url || !data.video.code) {
 										socket.emit('plugins.videos.error', 'Des données sont manquantes.');
 									}
 									else {
@@ -500,11 +498,11 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 										}
 
-									}
+									}*/
 
 								}
 								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.edit : ' + ((e.message) ? e.message : e));
+									Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + ((e.message) ? e.message : e));
 									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 								}
 
@@ -519,7 +517,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 								try {
 
-									that.categories.forEach(function(category, catkey) {
+									/*that.categories.forEach(function(category, catkey) {
 
 										if (category.code === data.category.code) {
 
@@ -554,11 +552,11 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 											socket.emit('plugins.videos.error', err);
 										});
 
-									}
+									}*/
 
 								}
 								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.delete : ' + ((e.message) ? e.message : e));
+									Container.get('logs').err('-- [plugins/VideosManager/videos/delete] : ' + ((e.message) ? e.message : e));
 									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 								}
 
@@ -592,7 +590,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 									}
 									catch (e) {
-										Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.playsound : ' + ((e.message) ? e.message : e));
+										Container.get('logs').err('-- [plugins/VideosManager/videos/playsound] : ' + ((e.message) ? e.message : e));
 										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 									}
 
@@ -624,11 +622,11 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 									}
 									catch (e) {
-										Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.playvideo : ' + ((e.message) ? e.message : e));
+										Container.get('logs').err('-- [plugins/VideosManager/videos/playvideo] : ' + ((e.message) ? e.message : e));
 										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 									}
 
-								});*/
+								});
 
 					});
 
