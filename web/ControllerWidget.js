@@ -91,10 +91,12 @@ app.controller('ControllerVideosManager',
 					$popup.alert("La vidéo n'a pas d'url.");
 				}
 				else if (!video.code) {
-					socket.emit('plugins.videos.video.add', { category : category, video : video });
+					video.category = category;
+					socket.emit('plugins.videos.video.add', video);
 				}
 				else {
-					socket.emit('plugins.videos.video.edit', { category : category, video : video });
+					video.category = category;
+					socket.emit('plugins.videos.video.edit', video);
 				}
 
 			};
@@ -105,7 +107,8 @@ app.controller('ControllerVideosManager',
 					message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
 					val: category.name,
 					onyes: function() {
-						socket.emit('plugins.videos.video.delete', { category : category, video : video });
+						video.category = category;
+						socket.emit('plugins.videos.video.delete', video);
 					}
 				});
 

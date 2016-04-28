@@ -97,7 +97,7 @@ module.exports = class DBPluginsVideosVideos {
 						}
 					else {
 
-						that.db.all(_sSelectQuery + " WHERE id_category = :id_user ORDER BY name ASC;", { ':id_category': category.id }, function(err, rows) {
+						that.db.all(_sSelectQuery + " WHERE id_category = :id_category ORDER BY name ASC;", { ':id_category': category.id }, function(err, rows) {
 
 							if (err) {
 								reject((err.message) ? err.message : err);
@@ -168,7 +168,7 @@ module.exports = class DBPluginsVideosVideos {
 
 	// write
 
-		/*add (video) {
+		add (video) {
 
 			let that = this;
 
@@ -177,22 +177,34 @@ module.exports = class DBPluginsVideosVideos {
 				try {
 
 					if (!video) {
-						reject('Aucune categorie renseignée.');
+						reject('Aucune vidéo renseignée.');
 					}
-					else if (!video.user) {
-						reject('Aucun utilisateur renseigné.');
+					else if (!video.category) {
+						reject('Aucune catégorie renseignée.');
 					}
-						else if (!category.user.id) {
-							reject("L'utilisateur renseigné n'est pas valide.");
+						else if (!video.category.id) {
+							reject("La catégorie renseignée n'est pas valide.");
 						}
-					else if (!category.name) {
+					else if (!video.name) {
 						reject('Aucun nom renseigné.');
+					}
+					else if (!video.code) {
+						reject('Aucun code renseigné.');
+					}
+					else if (!video.url) {
+						reject('Aucune url renseignée.');
+					}
+					else if (!video.urlembeded) {
+						reject('Aucune url embarquée renseignée.');
 					}
 					else {
 
-						that.db.run("INSERT INTO plugin_videos_categories (id_user, name) VALUES (:id_user, :name);", {
-							':id_user': category.user.id,
-							':name': category.name
+						that.db.run("INSERT INTO plugin_videos_videos (id_category, name, code, url, urlembeded) VALUES (:id_category, :name, :code, :url, :urlembeded);", {
+							':id_category': video.category.id,
+							':name': video.name,
+							':code': video.code,
+							':url': video.url,
+							':urlembeded': video.urlembeded
 						}, function(err) {
 
 							if (err) {
@@ -215,7 +227,7 @@ module.exports = class DBPluginsVideosVideos {
 
 		}
 
-		edit (category) {
+		/*edit (category) {
 
 			let that = this;
 

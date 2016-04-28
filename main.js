@@ -199,7 +199,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 		return new Promise(function(resolve, reject) {
 
 			try {
-
+				
 				Container.get('users').lastInserted().then(function(user) {
 
 					that.categories = new Categories(Container.get('db'));
@@ -388,56 +388,41 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 								try {
 
-									/*if (!data || !data.video || !data.video.name || !data.video.url) {
-										socket.emit('plugins.videos.error', 'Des données sont manquantes.');
+									if (!data || !data.category) {
+										socket.emit('plugins.videos.error', "La catégorie n'est pas renseignée ou est invalide.");
+									}
+									else if (!data.name) {
+										socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
+									}
+									else if (!data.url) {
+										socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
 									}
 									else {
 
-										let bCategoryFound = false, stVideo = false;
+										that.videos.searchByCategoryByName(data.category, data.name).then(function(video) {
 
-											that.categories.forEach(function(category, key) {
+											if (video) {
+												socket.emit('plugins.videos.error', 'Ce nom de vidéo existe déjà.');
+											}
+											else {
+												
+												that.videos.add(_formateVideo(data)).then(function(video) {
 
-												if (category.code === data.category.code) {
+													Container.get('websockets').emit('plugins.videos.video.added', video);
 
-													bCategoryFound = true;
+												}).catch(function(err) {
+													Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + err);
+													socket.emit('plugins.videos.error', err);
+												});
 
-													stVideo = _formateVideo(data.video);
+											}
 
-													category.videos.forEach(function(video, vidkey) {
+										}).catch(function(err) {
+											Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategoryByName] : ' + err);
+											socket.emit('plugins.videos.error', err);
+										});
 
-														if (video.code === stVideo.code) {
-															stVideo = false;
-														}
-
-													});
-
-													if (stVideo) {
-														that.categories[key].videos.push(stVideo);
-													}
-
-												}
-
-											});
-
-										if (!bCategoryFound) {
-											socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
-										}
-										else if (!stVideo) {
-											socket.emit('plugins.videos.error', 'Cette vidéo est déjà enregistrée.');
-										}
-										else {
-											
-											that.saveData().then(function() {
-												Container.get('websockets').emit('plugins.videos.video.added', stVideo);
-											})
-											.catch(function(err) {
-												Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.add : ' + err);
-												socket.emit('plugins.videos.error', err);
-											});
-
-										}
-										
-									}*/
+									}
 
 								}
 								catch (e) {
@@ -681,7 +666,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 	}
 
-	uninstall () {
+	uninstall (Container) {
 		
 		return fs.unlinkProm(path.join(__dirname, 'backup.json')).then(function() {
 			return _runSQLFile(Container, path.join(__dirname, 'database', 'delete.sql'));
