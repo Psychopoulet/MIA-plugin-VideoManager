@@ -90,11 +90,13 @@ app.controller('ControllerVideosManager',
 				else if (!video.url) {
 					$popup.alert("La vidéo n'a pas d'url.");
 				}
-				else if (!video.code) {
-					socket.emit('plugins.videos.video.add', { category : category, video : video });
+				else if (!video.id) {
+					video.category = category;
+					socket.emit('plugins.videos.video.add', video);
 				}
 				else {
-					socket.emit('plugins.videos.video.edit', { category : category, video : video });
+					video.category = category;
+					socket.emit('plugins.videos.video.edit', video);
 				}
 
 			};
@@ -105,7 +107,8 @@ app.controller('ControllerVideosManager',
 					message: 'Voulez-vous vraiment supprimer "' + video.name + '" ?',
 					val: category.name,
 					onyes: function() {
-						socket.emit('plugins.videos.video.delete', { category : category, video : video });
+						video.category = category;
+						socket.emit('plugins.videos.video.delete', video);
 					}
 				});
 
@@ -211,7 +214,7 @@ app.controller('ControllerVideosManager',
 
 					for (var i = 0; i < $scope.categories.length; ++i) {
 
-						if (category.code == $scope.categories[i].code) {
+						if (category.id == $scope.categories[i].id) {
 							$scope.categories[i] = category;
 							$scope.selectCategory(category);
 							break;
@@ -254,7 +257,7 @@ app.controller('ControllerVideosManager',
 
 					for (var i = 0; i < $scope.videos.length; ++i) {
 
-						if (video.code == $scope.videos[i].code) {
+						if (video.id == $scope.videos[i].id) {
 							$scope.videos[i] = video;
 							$scope.selectedvideo = video;
 							break;
