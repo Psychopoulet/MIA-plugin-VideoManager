@@ -134,6 +134,8 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 		this.categories = null;
 		this.videos = null;
 
+		this.loaded = false;
+
 	}
 
 	load (Container) {
@@ -149,418 +151,424 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 					that.categories = new Categories(Container.get('db'));
 					that.videos = new Videos(Container.get('db'));
 
+					that.loaded = true;
+
 					Container.get('websockets').onDisconnect(_freeSocket).onLog(function(socket) {
 
-						that.categories.searchByUser(user).then(function(categories) {
-							socket.emit('plugins.videos.categories', categories);
-						}).catch(function(err) {
-							Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUser] : ' + ((err.message) ? err.message : err));
-							socket.emit('plugins.videos.error', (err.message) ? err.message : err);
-						});
+						if (that.loaded) {
+							
+							that.categories.searchByUser(user).then(function(categories) {
+								socket.emit('plugins.videos.categories', categories);
+							}).catch(function(err) {
+								Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUser] : ' + ((err.message) ? err.message : err));
+								socket.emit('plugins.videos.error', (err.message) ? err.message : err);
+							});
 
-						// categories
+							// categories
 
-							socket.on('plugins.videos.category.add', function (data) {
+								socket.on('plugins.videos.category.add', function (data) {
 
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.category.add');
-								}
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.category.add');
+									}
 
-								try {
+									try {
 
-									that.categories.searchByUserByName(user, data.name).then(function(category) {
+										that.categories.searchByUserByName(user, data.name).then(function(category) {
 
-										if (category) {
-											socket.emit('plugins.videos.error', 'Cette catégorie existe déjà.');
-										}
-										else {
-											
-											that.categories.add({
-												user: user,
-												name : data.name
-											}).then(function(category) {
+											if (category) {
+												socket.emit('plugins.videos.error', 'Cette catégorie existe déjà.');
+											}
+											else {
+												
+												that.categories.add({
+													user: user,
+													name : data.name
+												}).then(function(category) {
 
-												Container.get('websockets').emit('plugins.videos.category.added', category);
+													Container.get('websockets').emit('plugins.videos.category.added', category);
 
-											}).catch(function(err) {
-												Container.get('logs').err('-- [plugins/VideosManager/categories/add] : ' + err);
-												socket.emit('plugins.videos.error', err);
-											})
+												}).catch(function(err) {
+													Container.get('logs').err('-- [plugins/VideosManager/categories/add] : ' + err);
+													socket.emit('plugins.videos.error', err);
+												})
 
-										}
+											}
 
-									}).catch(function(err) {
-										Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUserByCode] : ' + err);
-										socket.emit('plugins.videos.error', err);
-									});
+										}).catch(function(err) {
+											Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUserByCode] : ' + err);
+											socket.emit('plugins.videos.error', err);
+										});
 
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManagercategories/add] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManagercategories/add] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
 
-							})
-							.on('plugins.videos.category.edit', function (data) {
+								})
+								.on('plugins.videos.category.edit', function (data) {
 
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.category.edit');
-								}
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.category.edit');
+									}
 
-								try {
+									try {
 
-									that.categories.searchById(data.id).then(function(category) {
+										that.categories.searchById(data.id).then(function(category) {
+
+											if (!category) {
+												socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
+											}
+											else {
+														
+												that.categories.searchByUserByName(user, data.name).then(function(_category) {
+
+													if (_category) {
+														socket.emit('plugins.videos.error', 'Ce nom existe déjà.');
+													}
+													else {
+
+														category.name = data.name;
+
+														that.categories.edit(category).then(function(category) {
+															Container.get('websockets').emit('plugins.videos.category.edited', category);
+														}).catch(function(err) {
+															Container.get('logs').err('-- [plugins/VideosManager/categories/edit] : ' + err);
+															socket.emit('plugins.videos.error', err);
+														});
+
+													}
+														
+												}).catch(function(err) {
+													Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUserByName] : ' + err);
+													socket.emit('plugins.videos.error', err);
+												});
+
+											}
+												
+										}).catch(function(err) {
+											Container.get('logs').err('-- [plugins/VideosManager/categories/searchById] : ' + err);
+											socket.emit('plugins.videos.error', err);
+										});
+
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/categories/edit] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
+
+								})
+								.on('plugins.videos.category.delete', function (data) {
+
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.category.delete');
+									}
+
+									try {
+
+										that.categories.searchById(data.id).then(function(category) {
+
+											if (!category) {
+												socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
+											}
+											else {
+
+												that.categories.delete(category).then(function() {
+
+													that.categories.searchByUser(user).then(function(categories) {
+														socket.emit('plugins.videos.categories', categories);
+													}).catch(function(err) {
+
+														Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUser] : ' + ((err.message) ? err.message : err));
+														socket.emit('plugins.videos.error', (err.message) ? err.message : err);
+
+													});
+													
+												}).catch(function(err) {
+													Container.get('logs').err('-- [plugins/VideosManager/categories/delete] : ' + err);
+													socket.emit('plugins.videos.error', err);
+												});
+
+											}
+													
+										}).catch(function(err) {
+											Container.get('logs').err('-- [plugins/VideosManager/categories/searchById] : ' + err);
+											socket.emit('plugins.videos.error', err);
+										});
+
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/categories/delete] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
+
+								});
+
+							// videos
+
+								socket.on('plugins.videos.videos', function(category) {
+
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.videos');
+									}
+
+									try {
 
 										if (!category) {
-											socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
+											socket.emit('plugins.videos.error', "La catégorie est invalide.");
 										}
 										else {
-													
-											that.categories.searchByUserByName(user, data.name).then(function(_category) {
 
-												if (_category) {
-													socket.emit('plugins.videos.error', 'Ce nom existe déjà.');
+											that.videos.searchByCategory(category).then(function(videos) {
+												socket.emit('plugins.videos.videos', videos);
+											}).catch(function(err) {
+												Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + err);
+												socket.emit('plugins.videos.error', err);
+											});
+											
+										}
+
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
+
+								})
+
+								.on('plugins.videos.video.add', function (data) {
+
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.video.add');
+									}
+
+									try {
+
+										if (!data) {
+											socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
+										}
+										else if (!data.category) {
+											socket.emit('plugins.videos.error', "La vidéo est invalide.");
+										}
+										else if (!data.name) {
+											socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
+										}
+										else if (!data.url) {
+											socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
+										}
+										else {
+
+											that.videos.searchByCategoryByName(data.category, data.name).then(function(video) {
+
+												if (video) {
+													socket.emit('plugins.videos.error', 'Ce nom de vidéo existe déjà.');
 												}
 												else {
+													
+													that.videos.add(_formateVideo(data)).then(function(video) {
 
-													category.name = data.name;
+														Container.get('websockets').emit('plugins.videos.video.added', video);
 
-													that.categories.edit(category).then(function(category) {
-														Container.get('websockets').emit('plugins.videos.category.edited', category);
 													}).catch(function(err) {
-														Container.get('logs').err('-- [plugins/VideosManager/categories/edit] : ' + err);
+														Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + err);
 														socket.emit('plugins.videos.error', err);
 													});
 
 												}
-													
+
 											}).catch(function(err) {
-												Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUserByName] : ' + err);
+												Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategoryByName] : ' + err);
 												socket.emit('plugins.videos.error', err);
 											});
 
 										}
-											
-									}).catch(function(err) {
-										Container.get('logs').err('-- [plugins/VideosManager/categories/searchById] : ' + err);
-										socket.emit('plugins.videos.error', err);
-									});
 
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/categories/edit] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
 
-							})
-							.on('plugins.videos.category.delete', function (data) {
+								})
+								.on('plugins.videos.video.edit', function (data) {
 
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.category.delete');
-								}
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.video.edit');
+									}
 
-								try {
+									try {
 
-									that.categories.searchById(data.id).then(function(category) {
-
-										if (!category) {
-											socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
+										if (!data) {
+											socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
+										}
+											else if (!data.id) {
+												socket.emit('plugins.videos.error', "La vidéo est invalide.");
+											}
+										else if (!data.name) {
+											socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
+										}
+										else if (!data.url) {
+											socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
 										}
 										else {
+											
+											that.videos.searchById(data.id).then(function(video) {
 
-											that.categories.delete(category).then(function() {
+												if (!video) {
+													socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
+												}
+												else {
+													
+													that.videos.edit(_formateVideo(data)).then(function(video) {
 
-												that.categories.searchByUser(user).then(function(categories) {
-													socket.emit('plugins.videos.categories', categories);
-												}).catch(function(err) {
+														Container.get('websockets').emit('plugins.videos.video.edited', video);
 
-													Container.get('logs').err('-- [plugins/VideosManager/categories/searchByUser] : ' + ((err.message) ? err.message : err));
-													socket.emit('plugins.videos.error', (err.message) ? err.message : err);
-
-												});
-												
-											}).catch(function(err) {
-												Container.get('logs').err('-- [plugins/VideosManager/categories/delete] : ' + err);
-												socket.emit('plugins.videos.error', err);
-											});
-
-										}
-												
-									}).catch(function(err) {
-										Container.get('logs').err('-- [plugins/VideosManager/categories/searchById] : ' + err);
-										socket.emit('plugins.videos.error', err);
-									});
-
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/categories/delete] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
-
-							});
-
-						// videos
-
-							socket.on('plugins.videos.videos', function(category) {
-
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.videos');
-								}
-
-								try {
-
-									if (!category) {
-										socket.emit('plugins.videos.error', "La catégorie est invalide.");
-									}
-									else {
-
-										that.videos.searchByCategory(category).then(function(videos) {
-											socket.emit('plugins.videos.videos', videos);
-										}).catch(function(err) {
-											Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + err);
-											socket.emit('plugins.videos.error', err);
-										});
-										
-									}
-
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
-
-							})
-
-							.on('plugins.videos.video.add', function (data) {
-
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.video.add');
-								}
-
-								try {
-
-									if (!data) {
-										socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
-									}
-									else if (!data.category) {
-										socket.emit('plugins.videos.error', "La vidéo est invalide.");
-									}
-									else if (!data.name) {
-										socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
-									}
-									else if (!data.url) {
-										socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
-									}
-									else {
-
-										that.videos.searchByCategoryByName(data.category, data.name).then(function(video) {
-
-											if (video) {
-												socket.emit('plugins.videos.error', 'Ce nom de vidéo existe déjà.');
-											}
-											else {
-												
-												that.videos.add(_formateVideo(data)).then(function(video) {
-
-													Container.get('websockets').emit('plugins.videos.video.added', video);
-
-												}).catch(function(err) {
-													Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + err);
-													socket.emit('plugins.videos.error', err);
-												});
-
-											}
-
-										}).catch(function(err) {
-											Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategoryByName] : ' + err);
-											socket.emit('plugins.videos.error', err);
-										});
-
-									}
-
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/videos/add] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
-
-							})
-							.on('plugins.videos.video.edit', function (data) {
-
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.video.edit');
-								}
-
-								try {
-
-									if (!data) {
-										socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
-									}
-										else if (!data.id) {
-											socket.emit('plugins.videos.error', "La vidéo est invalide.");
-										}
-									else if (!data.name) {
-										socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
-									}
-									else if (!data.url) {
-										socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
-									}
-									else {
-										
-										that.videos.searchById(data.id).then(function(video) {
-
-											if (!video) {
-												socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
-											}
-											else {
-												
-												that.videos.edit(_formateVideo(data)).then(function(video) {
-
-													Container.get('websockets').emit('plugins.videos.video.edited', video);
-
-												}).catch(function(err) {
-													Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + err);
-													socket.emit('plugins.videos.error', err);
-												});
-
-											}
-
-										}).catch(function(err) {
-											Container.get('logs').err('-- [plugins/VideosManager/videos/searchById] : ' + err);
-											socket.emit('plugins.videos.error', err);
-										});
-
-									}
-
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
-
-							})
-							.on('plugins.videos.video.delete', function (data) {
-
-								if (Container.get('conf').get('debug')) {
-									Container.get('logs').log('plugins.videos.video.delete');
-								}
-
-								try {
-
-									if (!data) {
-										socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
-									}
-										else if (!data.id) {
-											socket.emit('plugins.videos.error', "La vidéo est invalide.");
-										}
-									else if (!data.category) {
-										socket.emit('plugins.videos.error', "La vidéo est invalide.");
-									}
-									else {
-
-										that.videos.searchById(data.id).then(function(video) {
-
-											if (!video) {
-												socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
-											}
-											else {
-												
-												that.videos.delete(data).then(function() {
-
-													that.videos.searchByCategory(data.category).then(function(videos) {
-														socket.emit('plugins.videos.videos', videos);
 													}).catch(function(err) {
-														Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + err);
+														Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + err);
 														socket.emit('plugins.videos.error', err);
 													});
 
-												}).catch(function(err) {
-													Container.get('logs').err('-- [plugins/VideosManager/videos/delete] : ' + err);
-													socket.emit('plugins.videos.error', err);
-												});
+												}
 
+											}).catch(function(err) {
+												Container.get('logs').err('-- [plugins/VideosManager/videos/searchById] : ' + err);
+												socket.emit('plugins.videos.error', err);
+											});
+
+										}
+
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
+
+								})
+								.on('plugins.videos.video.delete', function (data) {
+
+									if (Container.get('conf').get('debug')) {
+										Container.get('logs').log('plugins.videos.video.delete');
+									}
+
+									try {
+
+										if (!data) {
+											socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée.");
+										}
+											else if (!data.id) {
+												socket.emit('plugins.videos.error', "La vidéo est invalide.");
+											}
+										else if (!data.category) {
+											socket.emit('plugins.videos.error', "La vidéo est invalide.");
+										}
+										else {
+
+											that.videos.searchById(data.id).then(function(video) {
+
+												if (!video) {
+													socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
+												}
+												else {
+													
+													that.videos.delete(data).then(function() {
+
+														that.videos.searchByCategory(data.category).then(function(videos) {
+															socket.emit('plugins.videos.videos', videos);
+														}).catch(function(err) {
+															Container.get('logs').err('-- [plugins/VideosManager/videos/searchByCategory] : ' + err);
+															socket.emit('plugins.videos.error', err);
+														});
+
+													}).catch(function(err) {
+														Container.get('logs').err('-- [plugins/VideosManager/videos/delete] : ' + err);
+														socket.emit('plugins.videos.error', err);
+													});
+
+												}
+
+											}).catch(function(err) {
+												Container.get('logs').err('-- [plugins/VideosManager/videos/searchById] : ' + err);
+												socket.emit('plugins.videos.error', err);
+											});
+											
+										}
+
+									}
+									catch (e) {
+										Container.get('logs').err('-- [plugins/VideosManager/videos/delete] : ' + ((e.message) ? e.message : e));
+										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+									}
+
+								});
+
+								// action
+
+									socket.on('plugins.videos.video.playsound', function (data) {
+
+										if (Container.get('conf').get('debug')) {
+											Container.get('logs').log('plugins.videos.video.playsound');
+										}
+
+										try {
+
+											if (!data) {
+												Container.get('logs').err('play video - données manquantes');
+												socket.emit('plugins.videos.error', 'Données manquantes');
+											}
+											else if (!data.child) {
+												Container.get('logs').err('play video - aucun enfant choisi');
+												socket.emit('plugins.videos.error', 'Aucun enfant choisi');
+											}
+											else if (!data.video) {
+												Container.get('logs').err('play video - aucune vidéo choisie');
+												socket.emit('plugins.videos.error', 'Aucune vidéo choisie');
+											}
+											else {
+												Container.get('childssockets').emitTo(data.child.token, 'media.sound.play', data.video);
 											}
 
-										}).catch(function(err) {
-											Container.get('logs').err('-- [plugins/VideosManager/videos/searchById] : ' + err);
-											socket.emit('plugins.videos.error', err);
-										});
-										
-									}
-
-								}
-								catch (e) {
-									Container.get('logs').err('-- [plugins/VideosManager/videos/delete] : ' + ((e.message) ? e.message : e));
-									Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-								}
-
-							});
-
-							// action
-
-								socket.on('plugins.videos.video.playsound', function (data) {
-
-									if (Container.get('conf').get('debug')) {
-										Container.get('logs').log('plugins.videos.video.playsound');
-									}
-
-									try {
-
-										if (!data) {
-											Container.get('logs').err('play video - données manquantes');
-											socket.emit('plugins.videos.error', 'Données manquantes');
 										}
-										else if (!data.child) {
-											Container.get('logs').err('play video - aucun enfant choisi');
-											socket.emit('plugins.videos.error', 'Aucun enfant choisi');
-										}
-										else if (!data.video) {
-											Container.get('logs').err('play video - aucune vidéo choisie');
-											socket.emit('plugins.videos.error', 'Aucune vidéo choisie');
-										}
-										else {
-											Container.get('childssockets').emitTo(data.child.token, 'media.sound.play', data.video);
+										catch (e) {
+											Container.get('logs').err('-- [plugins/VideosManager/videos/playsound] : ' + ((e.message) ? e.message : e));
+											Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
 										}
 
-									}
-									catch (e) {
-										Container.get('logs').err('-- [plugins/VideosManager/videos/playsound] : ' + ((e.message) ? e.message : e));
-										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-									}
+									});
 
-								});
+									socket.on('plugins.videos.video.playvideo', function (data) {
 
-								socket.on('plugins.videos.video.playvideo', function (data) {
-
-									if (Container.get('conf').get('debug')) {
-										Container.get('logs').log('plugins.videos.video.playvideo');
-									}
-
-									try {
-
-										if (!data) {
-											Container.get('logs').err('play video - données manquantes');
-											socket.emit('plugins.videos.error', 'Données manquantes');
-										}
-										else if (!data.child) {
-											Container.get('logs').err('play video - aucun enfant choisi');
-											socket.emit('plugins.videos.error', 'Aucun enfant choisi');
-										}
-										else if (!data.video) {
-											Container.get('logs').err('play video - aucune vidéo choisie');
-											socket.emit('plugins.videos.error', 'Aucune vidéo choisie');
-										}
-										else {
-											Container.get('childssockets').emitTo(data.child.token, 'media.video.play', data.video);
+										if (Container.get('conf').get('debug')) {
+											Container.get('logs').log('plugins.videos.video.playvideo');
 										}
 
-									}
-									catch (e) {
-										Container.get('logs').err('-- [plugins/VideosManager/videos/playvideo] : ' + ((e.message) ? e.message : e));
-										Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-									}
+										try {
 
-								});
+											if (!data) {
+												Container.get('logs').err('play video - données manquantes');
+												socket.emit('plugins.videos.error', 'Données manquantes');
+											}
+											else if (!data.child) {
+												Container.get('logs').err('play video - aucun enfant choisi');
+												socket.emit('plugins.videos.error', 'Aucun enfant choisi');
+											}
+											else if (!data.video) {
+												Container.get('logs').err('play video - aucune vidéo choisie');
+												socket.emit('plugins.videos.error', 'Aucune vidéo choisie');
+											}
+											else {
+												Container.get('childssockets').emitTo(data.child.token, 'media.video.play', data.video);
+											}
+
+										}
+										catch (e) {
+											Container.get('logs').err('-- [plugins/VideosManager/videos/playvideo] : ' + ((e.message) ? e.message : e));
+											Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
+										}
+
+									});
+
+						}
 
 					});
 
@@ -589,6 +597,7 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 				that.categories = null;
 				that.videos = null;
+				that.loaded = false;
 
 				Container.get('websockets').getSockets().forEach(_freeSocket);
 
