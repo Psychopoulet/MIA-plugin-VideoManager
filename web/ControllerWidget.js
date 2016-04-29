@@ -90,7 +90,7 @@ app.controller('ControllerVideosManager',
 				else if (!video.url) {
 					$popup.alert("La vidéo n'a pas d'url.");
 				}
-				else if (!video.code) {
+				else if (!video.id) {
 					video.category = category;
 					socket.emit('plugins.videos.video.add', video);
 				}
@@ -214,7 +214,7 @@ app.controller('ControllerVideosManager',
 
 					for (var i = 0; i < $scope.categories.length; ++i) {
 
-						if (category.code == $scope.categories[i].code) {
+						if (category.id == $scope.categories[i].id) {
 							$scope.categories[i] = category;
 							$scope.selectCategory(category);
 							break;
@@ -257,7 +257,7 @@ app.controller('ControllerVideosManager',
 
 					for (var i = 0; i < $scope.videos.length; ++i) {
 
-						if (video.code == $scope.videos[i].code) {
+						if (video.id == $scope.videos[i].id) {
 							$scope.videos[i] = video;
 							$scope.selectedvideo = video;
 							break;

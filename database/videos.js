@@ -3,7 +3,7 @@
 
 // private
 
-	var _sSelectQuery = "SELECT id, code, name, url, urlembeded FROM plugin_videos_videos";
+	var _sSelectQuery = "SELECT id, name, url, urlembeded FROM plugin_videos_videos";
 
 // module
 
@@ -188,9 +188,6 @@ module.exports = class DBPluginsVideosVideos {
 					else if (!video.name) {
 						reject('Aucun nom renseigné.');
 					}
-					else if (!video.code) {
-						reject('Aucun code renseigné.');
-					}
 					else if (!video.url) {
 						reject('Aucune url renseignée.');
 					}
@@ -199,10 +196,9 @@ module.exports = class DBPluginsVideosVideos {
 					}
 					else {
 
-						that.db.run("INSERT INTO plugin_videos_videos (id_category, name, code, url, urlembeded) VALUES (:id_category, :name, :code, :url, :urlembeded);", {
+						that.db.run("INSERT INTO plugin_videos_videos (id_category, name, url, urlembeded) VALUES (:id_category, :name, :url, :urlembeded);", {
 							':id_category': video.category.id,
 							':name': video.name,
-							':code': video.code,
 							':url': video.url,
 							':urlembeded': video.urlembeded
 						}, function(err) {
@@ -227,7 +223,7 @@ module.exports = class DBPluginsVideosVideos {
 
 		}
 
-		/*edit (category) {
+		edit (video) {
 
 			let that = this;
 
@@ -235,27 +231,38 @@ module.exports = class DBPluginsVideosVideos {
 
 				try {
 
-					if (!category) {
-						reject('Aucune categorie renseignée.');
+					if (!video) {
+						reject('Aucune vidéo renseignée.');
 					}
-						else if (!category.id) {
-							reject('La catégorie renseignée est incorrecte.');
+					else if (!video.category) {
+						reject('Aucune catégorie renseignée.');
+					}
+						else if (!video.category.id) {
+							reject("La catégorie renseignée n'est pas valide.");
 						}
-					else if (!category.name) {
+					else if (!video.name) {
 						reject('Aucun nom renseigné.');
+					}
+					else if (!video.url) {
+						reject('Aucune url renseignée.');
+					}
+					else if (!video.urlembeded) {
+						reject('Aucune url embarquée renseignée.');
 					}
 					else {
 
-						that.db.run("UPDATE plugin_videos_categories SET name = :name WHERE id = :id;", {
-							':id': category.id,
-							':name': category.name
+						that.db.run("UPDATE plugin_videos_videos SET name = :name, url = :url, urlembeded = :urlembeded WHERE id = :id;", {
+							':id': video.id,
+							':name': video.name,
+							':url': video.url,
+							':urlembeded': video.urlembeded
 						}, function(err) {
 
 							if (err) {
 								reject((err.message) ? err.message : err);
 							}
 							else {
-								resolve(category);
+								resolve(video);
 							}
 
 						});
@@ -271,21 +278,21 @@ module.exports = class DBPluginsVideosVideos {
 
 		}
 
-		delete (category) {
+		delete (video) {
 			
 			let that = this;
 
 			return new Promise(function(resolve, reject) {
 
-				if (!category) {
-					reject('Aucune catégorie renseignée.');
+				if (!video) {
+					reject('Aucune vidéo renseignée.');
 				}
-				else if (!category.id) {
-					reject("La catégorie renseignée est invalide.");
+				else if (!video.id) {
+					reject("La vidéo renseignée est invalide.");
 				}
 				else {
 
-					that.db.run("DELETE FROM plugin_videos_categories WHERE id = :id;", { ':id' : category.id }, function(err) {
+					that.db.run("DELETE FROM plugin_videos_videos WHERE id = :id;", { ':id' : video.id }, function(err) {
 
 						if (err) {
 							reject((err.message) ? err.message : err);
@@ -300,6 +307,6 @@ module.exports = class DBPluginsVideosVideos {
 
 			});
 
-		}*/
+		}
 
 };

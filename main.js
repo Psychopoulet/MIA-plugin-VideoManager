@@ -79,29 +79,22 @@
 
 		if (-1 < video.url.indexOf('youtu')) {
 
-			if (!video.code || '' == video.code) {
-
-				if (-1 == video.url.indexOf('=')) {
-					video.url = video.url.replace('youtu.be/', 'youtube.com/watch?v=');
-				}
-
-				video.code = video.url.replace(/&(.*)/, '').split('=')[1];
-				
+			if (-1 == video.url.indexOf('=')) {
+				video.url = video.url.replace('youtu.be/', 'youtube.com/watch?v=');
 			}
 
-			video.url = 'https://www.youtube.com/watch?v=' + video.code;
-			video.urlembeded = 'https://www.youtube.com/embed/' + video.code;
+			let code = video.url.replace(/&(.*)/, '').split('=')[1];
+			
+			video.url = 'https://www.youtube.com/watch?v=' + code;
+			video.urlembeded = 'https://www.youtube.com/embed/' + code;
 
 		}
 		else if (-1 < video.url.indexOf('dailymotion')) {
 
-			if (!video.code || '' == video.code) {
-				let parts = video.url.split('_')[0].split('/');
-				video.code = parts[parts.length-1];
-			}
+			let parts = video.url.split('_')[0].split('/'), code = parts[parts.length-1];
 
-			video.url = 'https://www.dailymotion.com/video/' + video.code;
-			video.urlembeded = 'https://www.dailymotion.com/embed/video/' + video.code;
+			video.url = 'https://www.dailymotion.com/video/' + code;
+			video.urlembeded = 'https://www.dailymotion.com/embed/video/' + code;
 
 		}
 
@@ -142,55 +135,6 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 		this.videos = null;
 
 	}
-
-	/*
-
-	loadVideosByCategory (Container, category) {
-
-		let tabVideos = [];
-
-		try {
-
-			Container.get('db').all("SELECT * FROM plugin_videos_videos WHERE id_category = :id_category;", { ':id_category': category.id }, function(err, rows) {
-
-				if (err) {
-					Container.get('logs').err('-- [plugins/VideosManager] - loadVideosByCategory : ' + ((err.message) ? err.message : err));
-					socket.emit('plugins.videos.error', (err.message) ? err.message : err);
-				}
-				else {
-
-					let videos = [];
-
-					if (rows) {
-
-						rows.forEach(function(video) {
-
-							videos.push({
-								urls : {
-									normal: video.url
-									embeded: video.urlembeded
-								},
-								code : video.code,
-								name : video.name
-							});
-
-						});
-
-					}
-
-					Container.get('websockets').emit('plugins.videos.videos', videos);
-
-				}
-
-			});
-
-		}
-		catch(e) {
-			Container.get('logs').err('-- [plugins/VideosManager] - loadVideosByCategory : ' + ((e.message) ? e.message : e));
-			Container.get('websockets').emit('plugins.videos.error', ((e.message) ? e.message : e));
-		}
-
-	}*/
 
 	load (Container) {
 
@@ -439,51 +383,41 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 								try {
 
-									/*if (!data || !data.video || !data.video.name || !data.video.url || !data.video.code) {
-										socket.emit('plugins.videos.error', 'Des données sont manquantes.');
+									if (!data || !data.id) {
+										socket.emit('plugins.videos.error', "La vidéo n'est pas renseignée ou est invalide.");
+									}
+									else if (!data.name) {
+										socket.emit('plugins.videos.error', "Le nom n'est pas renseigné.");
+									}
+									else if (!data.url) {
+										socket.emit('plugins.videos.error', "L'url n'est pas renseignée.");
 									}
 									else {
 										
-										let bCategoryFound = false, stVideo = false;
+										that.videos.searchById(data.id).then(function(video) {
 
-											that.categories.forEach(function(category, catkey) {
+											if (!video) {
+												socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
+											}
+											else {
+												
+												that.videos.edit(_formateVideo(data)).then(function(video) {
 
-												if (category.code === data.category.code) {
+													Container.get('websockets').emit('plugins.videos.video.edited', video);
 
-													bCategoryFound = true;
+												}).catch(function(err) {
+													Container.get('logs').err('-- [plugins/VideosManager/videos/edit] : ' + err);
+													socket.emit('plugins.videos.error', err);
+												});
 
-													category.videos.forEach(function(video, vidkey) {
+											}
 
-														if (video.code === data.video.code) {
-															stVideo = _formateVideo(data.video);
-															that.categories[catkey].videos[vidkey] = stVideo;
-														}
+										}).catch(function(err) {
+											Container.get('logs').err('-- [plugins/VideosManager/videos/searchById] : ' + err);
+											socket.emit('plugins.videos.error', err);
+										});
 
-													});
-
-												}
-
-											});
-
-										if (!bCategoryFound) {
-											socket.emit('plugins.videos.error', 'Impossible de trouver cette catégorie.');
-										}
-										else if (!stVideo) {
-											socket.emit('plugins.videos.error', 'Impossible de trouver cette vidéo.');
-										}
-										else {
-
-											that.saveData().then(function() {
-												Container.get('websockets').emit('plugins.videos.video.edited', stVideo);
-											})
-											.catch(function(err) {
-												Container.get('logs').err('-- [plugins/VideosManager] - plugins.videos.video.edit : ' + err);
-												socket.emit('plugins.videos.error', err);
-											});
-
-										}
-
-									}*/
+									}
 
 								}
 								catch (e) {
@@ -498,11 +432,11 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 									Container.get('logs').log('plugins.videos.video.delete');
 								}
 
-								let bCategoryFound = false, bVideoFound = false;
-
 								try {
 
-									/*that.categories.forEach(function(category, catkey) {
+									/*let bCategoryFound = false, bVideoFound = false;
+
+									that.categories.forEach(function(category, catkey) {
 
 										if (category.code === data.category.code) {
 
