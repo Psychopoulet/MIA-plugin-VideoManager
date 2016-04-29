@@ -609,8 +609,10 @@ module.exports = class MIAPluginVideosManager extends require('simplepluginsmana
 
 	update (Container) {
 
+		let that = this;
+
 		return fs.unlinkProm(path.join(__dirname, 'backup.json')).then(function() {
-			return this.install(Container);
+			return that.install(Container);
 		});
 
 	}
